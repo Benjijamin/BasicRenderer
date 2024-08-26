@@ -1,0 +1,25 @@
+
+LOG --- 02:15:47.541658100 --- 2024-08-26
+
+xmin = 212, ymin = 198, xmax = 254, ymax = 257 
+image printed to output.ppm
+
+LOG --- 02:42:54.113879100 --- 2024-08-26
+
+xmin = 212, ymin = 198, xmax = 254, ymax = 257 
+image printed to output.ppm
+
+LOG --- 02:44:02.305378600 --- 2024-08-26
+
+xmin = 184, ymin = 112, xmax = 255, ymax = 256 
+image printed to output.ppm
+
+LOG --- 02:44:26.297385200 --- 2024-08-26
+
+xmin = 112, ymin = 112, xmax = 255, ymax = 256 
+image printed to output.ppm
+
+LOG --- 02:44:57.035790100 --- 2024-08-26
+
+xmin = 112, ymin = 64, xmax = 255, ymax = 256 
+image printed to output.ppm
