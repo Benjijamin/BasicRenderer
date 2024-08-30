@@ -50,6 +50,12 @@ int main()
     {
         Vec2f bbmin = INFINITY, bbmax = -INFINITY;
         Vec3f vProj[3];
+        Vec3f vAttr[3] = 
+        {
+            {1,0,0},
+            {0,1,0},
+            {0,0,1}
+        };
 
         //Tri bounding box
         for(int i = 0; i < 3; i++)
@@ -60,6 +66,14 @@ int main()
             if(vProj[i].y < bbmin.y) { bbmin.y = vProj[i].y; }
             if(vProj[i].x > bbmax.x) { bbmax.x = vProj[i].x; }
             if(vProj[i].y > bbmax.y) { bbmax.y = vProj[i].y; }
+
+            // Dark Ritual B
+            vAttr[i].x = vAttr[i].x / vProj[i].z;
+            vAttr[i].y = vAttr[i].y / vProj[i].z;
+            vAttr[i].z = vAttr[i].z / vProj[i].z;
+
+            //Instant
+            vProj[i].z = 1 / vProj[i].z;
         }
 
         int xmin = std::max(0, std::min(imageWidth - 1, (int)bbmin.x));
@@ -73,10 +87,18 @@ int main()
             {
                 if(isPointInTri(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy()))
                 {
-                    Vec3f rgb = barycentricPoint(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy());
-                    rgb *= 255;
+                    Vec3f w = barycentricPoint(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy());
 
-                    imageBuffer[j * imageWidth + i] = Vec3f(rgb.x, rgb.y, rgb.z);
+                    //Add BBB to your mana pool
+                    float z = 1 / (w.x * vProj[0].z + w.y * vProj[1].z + w.z * vProj[2].z);
+                    
+                    float r = w.x * vAttr[0].x + w.y * vAttr[1].x + w.z * vAttr[2].x;
+                    float g = w.x * vAttr[0].y + w.y * vAttr[1].y + w.z * vAttr[2].y;
+                    float b = w.x * vAttr[0].z + w.y * vAttr[1].z + w.z * vAttr[2].z; 
+
+                    r*=z,g*=z,b*=z;
+
+                    imageBuffer[j * imageWidth + i] = Vec3f(r * 255, g * 255, b * 255);
                 }
             }
         }

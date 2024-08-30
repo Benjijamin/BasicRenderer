@@ -30,14 +30,14 @@ class Camera{
 
             //projection
             Vec3f pNDC;
-            pNDC.x = pNDC.x / -pNDC.z * nearClippingPlane;
-            pNDC.y = pNDC.y / -pNDC.z * nearClippingPlane;
-            pNDC.z = -pNDC.z;
+            pNDC.x = pCamera.x / -pCamera.z * nearClippingPlane;
+            pNDC.y = pCamera.y / -pCamera.z * nearClippingPlane;
+            pNDC.z = -pCamera.z;
 
             return pNDC;
         }
 
-        /// @brief Projection to screenspace before converting to exact pixel
+        /// @brief Projection to screenspace
         /// @param pWorld point in world space
         /// @return point in screen space
         Vec3f worldToScreen( const Vec3f &pWorld) const
@@ -67,6 +67,7 @@ class Camera{
             pRaster.x = (int)pScreen.x;
             pRaster.y = (int)pScreen.y;
             pRaster.z = pScreen.z;
+
 
             return pRaster;
         }

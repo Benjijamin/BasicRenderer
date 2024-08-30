@@ -13,6 +13,13 @@ class Matrix44
         //[0][0][x]
 
         Matrix44() {}
+        Matrix44(T a, T b, T c, T d, T e, T f, T g, T h, T i, T j, T k, T l, T m, T n, T o, T p)
+        {
+            m[0][0] = a; m[0][1] = b; m[0][2] = c; m[0][3] = d;
+            m[1][0] = e; m[1][1] = f; m[1][2] = g; m[1][3] = h;
+            m[2][0] = i; m[2][1] = j; m[2][2] = k; m[2][3] = l;
+            m[3][0] = m; m[3][1] = n; m[3][2] = o; m[3][3] = p;
+        }
         const T* operator [] (uint8_t i) const { return m[i]; }
         T* operator [] (uint8_t i) { return m[i]; }
 
