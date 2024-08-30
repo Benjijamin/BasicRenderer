@@ -4,8 +4,8 @@
 #include <ctime>
 #include <cmath>
 #include "date.h"
-#include "vec3.h"
 #include "vec2.h"
+#include "vec3.h"
 #include "matrix.h"
 #include "tri.h"
 #include "ppm.h"
@@ -28,18 +28,30 @@ int main()
     
     std::vector<std::vector<Vec3f>> image(imageWidth, std::vector<Vec3f>(imageHeight));
 
-    Tri tris[1] = 
+    Vec3f *imageBuffer = new Vec3f[imageWidth * imageHeight];
+    float *depthBuffer = new float[imageWidth * imageHeight];
+
+    for(int j = 0; j < imageHeight; j++)
     {
-        Tri(Vec3f(-0.01,-0.01,-10), Vec3f(-2,-0.01,-10), Vec3f(-0.2,0.3,-1.5)) 
+        for(int i = 0; i < imageWidth; i++)
+        {
+            depthBuffer[j * imageWidth + i] = INFINITY;
+        }
+    }
+
+    Tri tris[2] = 
+    {
+        Tri(Vec3f(-3,-0.5,10), Vec3f(-1,-1,10), Vec3f(-1.5,-2,10)),
+        Tri(Vec3f(-1.5,-2,11), Vec3f(-3,-0.5,8), Vec3f(-1,-1,8))
     };
 
-    //pour chaque triangle
-    //projeter point
+
     for(Tri tri : tris)
     {
         Vec2f bbmin = INFINITY, bbmax = -INFINITY;
         Vec3f vProj[3];
 
+        //Tri bounding box
         for(int i = 0; i < 3; i++)
         {
             vProj[i] = cam.worldToScreen(tri[i]);
@@ -55,30 +67,24 @@ int main()
         int xmax = std::max(0, std::min(imageWidth - 1, (int)bbmax.x));
         int ymax = std::max(0, std::min(imageHeight - 1, (int)bbmax.y));
 
-        printf("xmin = %i, ymin = %i, xmax = %i, ymax = %i \n",xmin,ymin,xmax,ymax);
-
         for(int j = ymin; j <= ymax; j++)
         {
             for(int i = xmin; i <= xmax; i++)
             {
-                image[i][j] = Vec3f(126,126,126);
-
-                if(pixelInTri(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy()))
+                if(isPointInTri(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy()))
                 {
-                    image[i][j] = Vec3f(255,255,255);
+                    Vec3f rgb = barycentricPoint(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy());
+                    rgb *= 255;
+
+                    imageBuffer[j * imageWidth + i] = Vec3f(rgb.x, rgb.y, rgb.z);
                 }
             }
         }
-
-        image[vProj[0].x][vProj[0].y] = Vec3f(255,0,255);
-        image[vProj[1].x][vProj[1].y] = Vec3f(255,0,255);
-        image[vProj[2].x][vProj[2].y] = Vec3f(255,0,255);
     }
 
     //print final image
     PpmWriter printer = PpmWriter(imageWidth, imageHeight);
-    printer.print(image);
-
+    printer.print(imageBuffer);
     printf("image printed to output.ppm\n");
 
     return 0;

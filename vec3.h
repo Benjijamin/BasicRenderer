@@ -22,12 +22,12 @@ class Vec3
         Vec3<T> operator *= (const T &mul)
         { x *= mul, y *= mul, z *= mul; return *this; }
 
-        T length()
+        T length() const
         {
             return sqrt(x*x + y*y + z*z);
         }
 
-        Vec2<T> xy()
+        Vec2<T> xy() const
         {
             return Vec2<T>(x, y);
         }

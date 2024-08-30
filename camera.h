@@ -21,7 +21,7 @@ class Camera{
         int imageWidth = 512, imageHeight = 512;
 
         
-        Vec3f worldToCanvas( const Vec3f &pWorld ) const
+        Vec3f worldToNDC( const Vec3f &pWorld ) const
         {
             //worldspace to cameraSpace
             Matrix4f worldToCamera;
@@ -29,12 +29,12 @@ class Camera{
             worldToCamera.multVecMatrix(pWorld, pCamera);
 
             //projection
-            Vec3f pCanvas;
-            pCanvas.x = pCamera.x / -pCamera.z * nearClippingPlane;
-            pCanvas.y = pCamera.y / -pCamera.z * nearClippingPlane;
-            pCanvas.z = -pCamera.z;
+            Vec3f pNDC;
+            pNDC.x = pNDC.x / -pNDC.z * nearClippingPlane;
+            pNDC.y = pNDC.y / -pNDC.z * nearClippingPlane;
+            pNDC.z = -pNDC.z;
 
-            return pCanvas;
+            return pNDC;
         }
 
         /// @brief Projection to screenspace before converting to exact pixel
@@ -42,12 +42,13 @@ class Camera{
         /// @return point in screen space
         Vec3f worldToScreen( const Vec3f &pWorld) const
         {
-            Vec3f pCanvas = worldToCanvas(pWorld);
+            Vec3f pNDC = worldToNDC(pWorld);
 
+            //[-1,1]
             Vec3f pNormalized;
-            pNormalized.x = 2 * pCanvas.x / (right - left) - (right + left) / (right - left);
-            pNormalized.y = 2 * pCanvas.y / (top - bottom) - (top + bottom) / (top - bottom);
-            pNormalized.z = pCanvas.z;
+            pNormalized.x = 2 * pNDC.x / (right - left) - (right + left) / (right - left);
+            pNormalized.y = 2 * pNDC.y / (top - bottom) - (top + bottom) / (top - bottom);
+            pNormalized.z = pNDC.z;
 
             Vec3f pScreen;
             pScreen.x = pNormalized.x * imageWidth;
