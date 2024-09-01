@@ -26,7 +26,7 @@ class PpmWriter
             file.close();
         }
 
-        void print(const Vec3f *imageBuffer) const
+        void print(const Vec3i *imageBuffer) const
         {
             std::ofstream file;
             file.open("output.ppm");

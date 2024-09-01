@@ -19,22 +19,26 @@ class Camera{
 
         //resolution
         int imageWidth = 512, imageHeight = 512;
+        float deviceAspectRatio = imageWidth / imageHeight;
 
-        
-        Vec3f worldToNDC( const Vec3f &pWorld ) const
+        void rescaleAspectRatio()
         {
-            //worldspace to cameraSpace
-            Matrix4f worldToCamera;
-            Vec3f pCamera;
-            worldToCamera.multVecMatrix(pWorld, pCamera);
+            float xS = 1;
+            float yS = 1;
 
-            //projection
-            Vec3f pNDC;
-            pNDC.x = pCamera.x / -pCamera.z * nearClippingPlane;
-            pNDC.y = pCamera.y / -pCamera.z * nearClippingPlane;
-            pNDC.z = -pCamera.z;
+            if(filmAspectRatio > deviceAspectRatio)
+            {
+                xS = deviceAspectRatio / filmAspectRatio;
+            } 
+            else 
+            {
+                yS = filmAspectRatio / deviceAspectRatio;
+            }
 
-            return pNDC;
+            right *= xS;
+            left = -right;
+            top *= yS;
+            bottom = -top;
         }
 
         /// @brief Projection to screenspace
@@ -42,36 +46,33 @@ class Camera{
         /// @return point in screen space
         Vec3f worldToScreen( const Vec3f &pWorld) const
         {
-            Vec3f pNDC = worldToNDC(pWorld);
+            //worldspace to cameraSpace
+            Matrix4f worldToCamera;
+            Vec3f pCamera;
+            worldToCamera.multVecMatrix(pWorld, pCamera);
+
+            //projection
+            Vec3f pScreen;
+            pScreen.x = nearClippingPlane * pCamera.x / -pCamera.z;
+            pScreen.y = nearClippingPlane * pCamera.y / -pCamera.z;
+
+            printf("\n point \n");
+            printf("-- pCamera \nx:%f,\ny:%f,\nz:%f \n",pCamera.x, pCamera.y, pCamera.z);
+            printf("-- pNDC \nx:%f,\ny:%f,\nz:%f \n",pScreen.x, pScreen.y, pCamera.z);
 
             //[-1,1]
-            Vec3f pNormalized;
-            pNormalized.x = 2 * pNDC.x / (right - left) - (right + left) / (right - left);
-            pNormalized.y = 2 * pNDC.y / (top - bottom) - (top + bottom) / (top - bottom);
-            pNormalized.z = pNDC.z;
+            Vec3f pNDC;
+            pNDC.x = 2 * pScreen.x / (right - left) - (right + left) / (right - left);
+            pNDC.y = 2 * pScreen.y / (top - bottom) - (top + bottom) / (top - bottom);
 
-            Vec3f pScreen;
-            pScreen.x = pNormalized.x * imageWidth;
+            Vec3f pRaster;
+            pRaster.x = (pNDC.x + 1) / 2 * imageWidth;
             //flip from screen space(origin bottom left) to raster space(origin top left)
-            pScreen.y = (1 - pNormalized.y) * imageHeight;
-            pScreen.z = pNormalized.z;
-
-            return pScreen;
-        }
-
-        Vec3i worldToPixel( const Vec3f &pWorld ) const
-        {
-            Vec3f pScreen = worldToScreen(pWorld);
-
-            Vec3i pRaster;
-            pRaster.x = (int)pScreen.x;
-            pRaster.y = (int)pScreen.y;
-            pRaster.z = pScreen.z;
-
+            pRaster.y = (1 - pNDC.y) / 2 * imageHeight;
+            pRaster.z = -pCamera.z;
 
             return pRaster;
         }
-
 
         bool isInView( const Vec2i pScreen ) const
         {

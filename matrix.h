@@ -12,28 +12,30 @@ class Matrix44
         //[0][x][0]
         //[0][0][x]
 
+        T x[4][4] = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
+
         Matrix44() {}
         Matrix44(T a, T b, T c, T d, T e, T f, T g, T h, T i, T j, T k, T l, T m, T n, T o, T p)
         {
-            m[0][0] = a; m[0][1] = b; m[0][2] = c; m[0][3] = d;
-            m[1][0] = e; m[1][1] = f; m[1][2] = g; m[1][3] = h;
-            m[2][0] = i; m[2][1] = j; m[2][2] = k; m[2][3] = l;
-            m[3][0] = m; m[3][1] = n; m[3][2] = o; m[3][3] = p;
+            x[0][0] = a; x[0][1] = b; x[0][2] = c; x[0][3] = d;
+            x[1][0] = e; x[1][1] = f; x[1][2] = g; x[1][3] = h;
+            x[2][0] = i; x[2][1] = j; x[2][2] = k; x[2][3] = l;
+            x[3][0] = m; x[3][1] = n; x[3][2] = o; x[3][3] = p;
         }
-        const T* operator [] (uint8_t i) const { return m[i]; }
-        T* operator [] (uint8_t i) { return m[i]; }
+        const T* operator [] (uint8_t i) const { return x[i]; }
+        T* operator [] (uint8_t i) { return x[i]; }
 
-        Matrix44 operator * (const Matrix44& mm) const
+        Matrix44 operator * (const Matrix44& m) const
         {
             Matrix44 mult;
             for(int i = 0; i < 4; i++)
             {
                 for(int j = 0; j < 4; j++)
                 {
-                    mult[i][j] = m[i][0] * mm[0][j] + 
-                                 m[i][1] * mm[1][j] + 
-                                 m[i][2] * mm[2][j] + 
-                                 m[i][3] * mm[3][j];
+                    mult[i][j] = x[i][0] * m[0][j] + 
+                                 x[i][1] * m[1][j] + 
+                                 x[i][2] * m[2][j] + 
+                                 x[i][3] * m[3][j];
                 }
             }
             return mult;
@@ -41,10 +43,10 @@ class Matrix44
 
         void multVecMatrix(const Vec3<T> &src, Vec3<T> &dst) const
         {
-            dst.x = src.x*m[0][0] + src.y*m[1][0] + src.z*m[2][0] + m[3][0];
-            dst.y = src.x*m[0][1] + src.y*m[1][1] + src.z*m[2][1] + m[3][1];
-            dst.z = src.x*m[0][2] + src.y*m[1][2] + src.z*m[2][2] + m[3][2];
-            T w = src.x*m[0][3] + src.y*m[1][3] + src.z*m[2][3] + m[3][3];
+            dst.x = src.x*x[0][0] + src.y*x[1][0] + src.z*x[2][0] + x[3][0];
+            dst.y = src.x*x[0][1] + src.y*x[1][1] + src.z*x[2][1] + x[3][1];
+            dst.z = src.x*x[0][2] + src.y*x[1][2] + src.z*x[2][2] + x[3][2];
+            T w = src.x*x[0][3] + src.y*x[1][3] + src.z*x[2][3] + x[3][3];
             if(w != 1 && w != 0) 
             {
                 dst.x /= w;
@@ -55,12 +57,11 @@ class Matrix44
 
         void multDirMatrix(const Vec3<T> &src, Vec3<T> &dst) const
         {
-            dst.x = src.x*m[0][0] + src.y*m[1][0] + src.z*m[2][0];
-            dst.y = src.x*m[0][1] + src.y*m[1][1] + src.z*m[2][1];
-            dst.z = src.x*m[0][2] + src.y*m[1][2] + src.z*m[2][2];
+            dst.x = src.x*x[0][0] + src.y*x[1][0] + src.z*x[2][0];
+            dst.y = src.x*x[0][1] + src.y*x[1][1] + src.z*x[2][1];
+            dst.z = src.x*x[0][2] + src.y*x[1][2] + src.z*x[2][2];
         }
 
-        //Black magic
         Matrix44 inverse() const
         {
             int i, j, k;
@@ -167,7 +168,6 @@ class Matrix44
             return *this;
         }
 
-        T m[4][4] = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 };
 
 typedef Matrix44<float> Matrix4f;
