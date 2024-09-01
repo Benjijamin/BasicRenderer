@@ -56,10 +56,6 @@ class Camera{
             pScreen.x = nearClippingPlane * pCamera.x / -pCamera.z;
             pScreen.y = nearClippingPlane * pCamera.y / -pCamera.z;
 
-            printf("\n point \n");
-            printf("-- pCamera \nx:%f,\ny:%f,\nz:%f \n",pCamera.x, pCamera.y, pCamera.z);
-            printf("-- pNDC \nx:%f,\ny:%f,\nz:%f \n",pScreen.x, pScreen.y, pCamera.z);
-
             //[-1,1]
             Vec3f pNDC;
             pNDC.x = 2 * pScreen.x / (right - left) - (right + left) / (right - left);

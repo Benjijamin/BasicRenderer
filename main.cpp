@@ -43,7 +43,7 @@ int main()
     Tri tris[1] = 
     {
         //Tri(Vec3f(-3,-0.5,10), Vec3f(-1,-1,10), Vec3f(-1.5,-2,10)),
-        Tri(Vec3f(0, 0, -5), Vec3f(1, 0, -5), Vec3f(.5, 1, -10))
+        Tri(Vec3f(0, 0, -5), Vec3f(1, 0, -5), Vec3f(.5, 1, -15))
     };
 
 
@@ -56,6 +56,12 @@ int main()
             {1,0,0},
             {0,1,0},
             {0,0,1}
+        };
+        Vec2f texCoord[3] =
+        {
+            {0,0},
+            {0,1},
+            {1,0}
         };
 
         //Tri bounding box
@@ -72,6 +78,9 @@ int main()
             vAttr[i].x = vAttr[i].x / vProj[i].z;
             vAttr[i].y = vAttr[i].y / vProj[i].z;
             vAttr[i].z = vAttr[i].z / vProj[i].z;
+
+            texCoord[i].x = texCoord[i].x / vProj[i].z;
+            texCoord[i].y = texCoord[i].y / vProj[i].z;
 
             //Instant
             vProj[i].z = 1 / vProj[i].z;
@@ -90,8 +99,6 @@ int main()
         {
             for(int i = xmin; i <= xmax; i++)
             {
-                imageBuffer[j * imageWidth + i] = Vec3i(122, 122, 0);
-
                 if(isPointInTri(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy()))
                 {
                     Vec3f w = barycentricPoint(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy());
@@ -104,6 +111,20 @@ int main()
                         depthBuffer[j * imageWidth + i] = z;
                     }
 
+                    //imageBuffer[j * imageWidth + i] = Vec3i(depthBuffer[j * imageWidth + i] * 10);
+
+                    
+                    float u = w.x * texCoord[0].x + w.y * texCoord[1].x + w.z * texCoord[2].x;
+                    float v = w.x * texCoord[0].y + w.y * texCoord[1].y + w.z * texCoord[2].y;
+                    
+                    u *= z;
+                    v *= z;
+
+                    float texture = (fmod(u * 10, 1) > 0.5) ^ (fmod(v * 10, 1) < 0.5);
+
+                    imageBuffer[j * imageWidth + i] = Vec3i(texture * 255);
+
+                    /*
                     float r = w.x * vAttr[0].x + w.y * vAttr[1].x + w.z * vAttr[2].x;
                     float g = w.x * vAttr[0].y + w.y * vAttr[1].y + w.z * vAttr[2].y;
                     float b = w.x * vAttr[0].z + w.y * vAttr[1].z + w.z * vAttr[2].z; 
@@ -111,6 +132,7 @@ int main()
                     r*=z,g*=z,b*=z;
 
                     imageBuffer[j * imageWidth + i] = Vec3i(r * 255, g * 255, b * 255);
+                    */
                 }
             }
         }

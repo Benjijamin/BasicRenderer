@@ -17,14 +17,14 @@ class Tri
 
 float edge(const Vec2f &p1, const Vec2f &p2, const Vec2f &p3)
 {
-    return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+    return (p3.x - p1.x) * (p2.y - p1.y) - (p3.y - p1.y) * (p2.x - p1.x);
 }
 
 bool isPointInTri(const Vec2f &p, const Vec2f &v1, const Vec2f &v2, const Vec2f &v3)
 {
-    float e1 = edge(p, v1, v2);
-    float e2 = edge(p, v2, v3);
-    float e3 = edge(p, v3, v1);
+    float e1 = edge(p, v2, v3);
+    float e2 = edge(p, v3, v1);
+    float e3 = edge(p, v1, v2);
 
     bool neg = (e1 < 0) || (e2 < 0) || (e3 < 0);
     bool pos = (e1 > 0) || (e2 > 0) || (e3 > 0);
@@ -34,9 +34,9 @@ bool isPointInTri(const Vec2f &p, const Vec2f &v1, const Vec2f &v2, const Vec2f 
 
 Vec3f barycentricPoint(const Vec2f &p, const Vec2f &v1, const Vec2f &v2, const Vec2f &v3)
 {
-    float e1 = edge(p, v1, v2);
-    float e2 = edge(p, v2, v3);
-    float e3 = edge(p, v3, v1);
+    float e1 = edge(p, v2, v3);
+    float e2 = edge(p, v3, v1);
+    float e3 = edge(p, v1, v2);
 
     float area = edge(v1,v2,v3);
     float w1 = e1 / area;
