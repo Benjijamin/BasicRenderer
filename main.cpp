@@ -4,11 +4,11 @@
 #include <ctime>
 #include <cmath>
 #include "date.h"
+#include "ppm.h"
 #include "vec2.h"
 #include "vec3.h"
 #include "matrix.h"
 #include "tri.h"
-#include "ppm.h"
 #include "camera.h"
 
 int main()
@@ -26,8 +26,6 @@ int main()
     //create camera
     Camera cam;
     cam.rescaleAspectRatio();
-    
-    std::vector<std::vector<Vec3f>> image(imageWidth, std::vector<Vec3f>(imageHeight));
 
     Vec3i *imageBuffer = new Vec3i[imageWidth * imageHeight];
     float *depthBuffer = new float[imageWidth * imageHeight];
@@ -43,7 +41,7 @@ int main()
     Tri tris[1] = 
     {
         //Tri(Vec3f(-3,-0.5,10), Vec3f(-1,-1,10), Vec3f(-1.5,-2,10)),
-        Tri(Vec3f(0, 0, -5), Vec3f(1, 0, -5), Vec3f(.5, 1, -15))
+        Tri(Vec3f(0, 0, -5), Vec3f(1, 0, -5), Vec3f(0, 1, -5))
     };
 
 
@@ -87,13 +85,9 @@ int main()
         }
 
         int xmin = std::max(0, std::min(imageWidth - 1, (int)bbmin.x));
-        printf("xmin: %i, bbmin.x: %f \n",xmin,bbmin.x);
         int ymin = std::max(0, std::min(imageHeight - 1, (int)bbmin.y));
-        printf("ymin: %i, bbmin.y: %f \n",ymin,bbmin.y);
         int xmax = std::max(0, std::min(imageWidth - 1, (int)bbmax.x));
-        printf("xmax: %i, bbmax.x: %f \n",xmax,bbmax.x);
         int ymax = std::max(0, std::min(imageHeight - 1, (int)bbmax.y));
-        printf("ymax: %i, bbmax.y: %f \n",ymax,bbmax.y);
 
         for(int j = ymin; j <= ymax; j++)
         {
@@ -120,19 +114,11 @@ int main()
                     u *= z;
                     v *= z;
 
+                    Vec3f v0cam, v1cam, v2cam;
+
                     float texture = (fmod(u * 10, 1) > 0.5) ^ (fmod(v * 10, 1) < 0.5);
 
                     imageBuffer[j * imageWidth + i] = Vec3i(texture * 255);
-
-                    /*
-                    float r = w.x * vAttr[0].x + w.y * vAttr[1].x + w.z * vAttr[2].x;
-                    float g = w.x * vAttr[0].y + w.y * vAttr[1].y + w.z * vAttr[2].y;
-                    float b = w.x * vAttr[0].z + w.y * vAttr[1].z + w.z * vAttr[2].z; 
-
-                    r*=z,g*=z,b*=z;
-
-                    imageBuffer[j * imageWidth + i] = Vec3i(r * 255, g * 255, b * 255);
-                    */
                 }
             }
         }

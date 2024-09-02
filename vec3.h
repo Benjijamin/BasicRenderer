@@ -1,35 +1,24 @@
+#ifndef VEC3_H
+#define VEC3_H
+#include "vec2.h"
+
 template<typename T>
 class Vec3
 {
     public:
-        Vec3() : x(T(0)), y(T(0)), z(T(0)){}
+        T x,y,z;
+        Vec3() : x(T(0)), y(T(0)), z(T(0)) {}
         Vec3(const T &val) : x(val), y(val), z(val){}
         Vec3(T xx, T yy, T zz) : x(xx), y(yy), z(zz){}
-        T x,y,z;
-
-        Vec3<T> operator + (const Vec3<T> &vec) const
-        { return Vec3<T>(x+vec.x, y+vec.y, z+vec.z); }
-        Vec3<T> operator += (const Vec3<T> &vec)
-        { x += vec.x, y += vec.y, z += vec.z; return *this; }
-
-        Vec3<T> operator - (const Vec3<T> &vec) const
-        { return Vec3<T>(x-vec.x, y-vec.y, z-vec.z); }
-        Vec3<T> operator -= (const Vec3<T> &vec)
-        { x -= vec.x, y -= vec.y, z -= vec.z; return *this; }
-
-        Vec3<T> operator * (const T &mul) const
-        { return Vec3<T>(x*mul, y*mul, z*mul); }
-        Vec3<T> operator *= (const T &mul)
-        { x *= mul, y *= mul, z *= mul; return *this; }
-
-        T length() const
-        {
-            return sqrt(x*x + y*y + z*z);
-        }
 
         Vec2<T> xy() const
         {
             return Vec2<T>(x, y);
+        }
+
+        T length() const
+        {
+            return sqrt(x*x + y*y + z*z);
         }
 
         Vec3<T>& normalize()
@@ -58,6 +47,19 @@ class Vec3
                 x * vec.y - vec.x * y
             );
         }
+
+        Vec3<T> operator + (const Vec3<T> &vec) const
+        { return Vec3<T>(x+vec.x, y+vec.y, z+vec.z); }
+        Vec3<T> operator += (const Vec3<T> &vec)
+        { x += vec.x, y += vec.y, z += vec.z; return *this; }
+        Vec3<T> operator - (const Vec3<T> &vec) const
+        { return Vec3<T>(x-vec.x, y-vec.y, z-vec.z); }
+        Vec3<T> operator -= (const Vec3<T> &vec)
+        { x -= vec.x, y -= vec.y, z -= vec.z; return *this; }
+        Vec3<T> operator * (const T &mul) const
+        { return Vec3<T>(x*mul, y*mul, z*mul); }
+        Vec3<T> operator *= (const T &mul)
+        { x *= mul, y *= mul, z *= mul; return *this; }
 };
 
 template<typename T>
@@ -75,7 +77,7 @@ T dot(const Vec3<T> &a, const Vec3<T> &b)
 template<typename T>
 Vec3<T> cross(const Vec3<T> &a, const Vec3<T> &b)
 {
-return Vec3<T>
+    return Vec3<T>
     (
         a.y * b.z - b.y * a.z,
         a.z * b.x - b.z * a.x,
@@ -85,3 +87,5 @@ return Vec3<T>
 
 typedef Vec3<float> Vec3f;
 typedef Vec3<int> Vec3i;
+
+#endif

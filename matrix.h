@@ -1,19 +1,10 @@
+#ifndef MATRIX_H
+#define MATRIX_H
+
 template<typename T>
 class Matrix44
 {
     public:
-        //[00][01][02][03] x
-        //[10][11][12][13] y
-        //[20][21][22][23] z
-        //[30][31][32][33] translate
-
-        //scale
-        //[x][0][0]
-        //[0][x][0]
-        //[0][0][x]
-
-        T x[4][4] = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
-
         Matrix44() {}
         Matrix44(T a, T b, T c, T d, T e, T f, T g, T h, T i, T j, T k, T l, T m, T n, T o, T p)
         {
@@ -21,24 +12,6 @@ class Matrix44
             x[1][0] = e; x[1][1] = f; x[1][2] = g; x[1][3] = h;
             x[2][0] = i; x[2][1] = j; x[2][2] = k; x[2][3] = l;
             x[3][0] = m; x[3][1] = n; x[3][2] = o; x[3][3] = p;
-        }
-        const T* operator [] (uint8_t i) const { return x[i]; }
-        T* operator [] (uint8_t i) { return x[i]; }
-
-        Matrix44 operator * (const Matrix44& m) const
-        {
-            Matrix44 mult;
-            for(int i = 0; i < 4; i++)
-            {
-                for(int j = 0; j < 4; j++)
-                {
-                    mult[i][j] = x[i][0] * m[0][j] + 
-                                 x[i][1] * m[1][j] + 
-                                 x[i][2] * m[2][j] + 
-                                 x[i][3] * m[3][j];
-                }
-            }
-            return mult;
         }
 
         void multVecMatrix(const Vec3<T> &src, Vec3<T> &dst) const
@@ -67,7 +40,7 @@ class Matrix44
             int i, j, k;
             Matrix44 s;
             Matrix44 t (*this);
-        
+
             // Forward elimination
             for (i = 0; i < 3 ; i++) 
             {
@@ -129,7 +102,7 @@ class Matrix44
                     }
                 }
             }
-        
+
             // Backward substitution
             for (i = 3; i >= 0; --i) 
             {
@@ -158,7 +131,7 @@ class Matrix44
                     }
                 }
             }
-        
+
             return s;
         }
 
@@ -168,6 +141,27 @@ class Matrix44
             return *this;
         }
 
+        const T* operator[] (int i) const { return x[i]; }
+        T* operator [] (int i) { return x[i]; }
+        Matrix44 operator * (const Matrix44& m) const
+        {
+            Matrix44 mult;
+            for(int i = 0; i < 4; i++)
+            {
+                for(int j = 0; j < 4; j++)
+                {
+                    mult[i][j] = x[i][0] * m[0][j] + 
+                                 x[i][1] * m[1][j] + 
+                                 x[i][2] * m[2][j] + 
+                                 x[i][3] * m[3][j];
+                }
+            }
+            return mult;
+        }
+    private:
+        T x[4][4] = {{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1}};
 };
 
 typedef Matrix44<float> Matrix4f;
+
+#endif

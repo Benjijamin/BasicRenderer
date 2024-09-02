@@ -1,3 +1,6 @@
+#include "vec2.h"
+#include "vec3.h"
+
 class Camera{
     public:
         Camera(){}
@@ -21,6 +24,8 @@ class Camera{
         int imageWidth = 512, imageHeight = 512;
         float deviceAspectRatio = imageWidth / imageHeight;
 
+        Matrix4f worldToCameraM;
+
         void rescaleAspectRatio()
         {
             float xS = 1;
@@ -41,15 +46,23 @@ class Camera{
             bottom = -top;
         }
 
-        /// @brief Projection to screenspace
+        /// @brief Projection to camera space
+        /// @param pWorld point in world space
+        /// @return point in camera space
+        Vec3f worldToCamera(const Vec3f &pWorld) const
+        {
+            Vec3f pCamera;
+            worldToCameraM.multVecMatrix(pWorld, pCamera);
+            return pCamera;
+        }
+
+        /// @brief Projection to screen space
         /// @param pWorld point in world space
         /// @return point in screen space
-        Vec3f worldToScreen( const Vec3f &pWorld) const
+        Vec3f worldToScreen(const Vec3f &pWorld) const
         {
             //worldspace to cameraSpace
-            Matrix4f worldToCamera;
-            Vec3f pCamera;
-            worldToCamera.multVecMatrix(pWorld, pCamera);
+            Vec3f pCamera = worldToCamera(pWorld);
 
             //projection
             Vec3f pScreen;
