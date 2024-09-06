@@ -12,7 +12,7 @@
 #include "camera.h"
 
 int main()
-{   
+{
     //Setup logging
     freopen( "log.txt" , "a", stdout);
 
@@ -38,7 +38,7 @@ int main()
 
     Tri tris[1] = 
     {
-        Tri(Vec3f(0, 0, -0.11), Vec3f(0.1, 0, -0.11), Vec3f(0.5, 1, -2))
+        Tri(Vec3f(0, 0, -0.21), Vec3f(1, 0, -3), Vec3f(1, 1, -5))
     };
 
 

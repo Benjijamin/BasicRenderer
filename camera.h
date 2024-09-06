@@ -8,27 +8,47 @@ class Camera{
             setProjectionMatrix();
         }
 
+        float inchToMm = 25.4;
+
+        float focalLength = 35;
+        float filmWidth = 0.98;
+        float filmHeight = 0.735;
         float nearClippingPlane = 0.1;
         float farClippingPlane = 100;
-        float fov = 90;
+        float filmAspectRatio = filmWidth / filmHeight;
 
-        //resolution
-        int imageWidth = 512, imageHeight = 512;
+        int imageWidth, imageHeight;
         float deviceAspectRatio = imageWidth / imageHeight;
+        float overscanScale = deviceAspectRatio / filmAspectRatio;
+        float top = ((filmWidth * inchToMm / 2) / focalLength) * nearClippingPlane;
+        float bottom = -top;
+        float right = top * filmAspectRatio * overscanScale;
+        float left = -right;
 
         Matrix4f worldToCameraM;
         Matrix4f projectionMatrix;
 
         void setProjectionMatrix()
         {
-            //Rescaling x and y coordinates according to fieldOfView, and rescaling z to [0(near),1(far)]
-            float fovScale = 1 / tan(fov * 0.5 * M_PI / 180);
-            float zRemapZ = -farClippingPlane / (farClippingPlane - nearClippingPlane);
-            float zRemapW = -farClippingPlane * nearClippingPlane / (farClippingPlane - nearClippingPlane);
-            projectionMatrix = Matrix4f( fovScale , 0, 0, 0,
-                                         0, fovScale, 0, 0,
-                                         0, 0, zRemapZ, -1,
-                                         0, 0, zRemapW, 0);
+            projectionMatrix[0][0] = 2 * nearClippingPlane / (right - left);
+            projectionMatrix[0][1] = 0;
+            projectionMatrix[0][2] = 0;
+            projectionMatrix[0][3] = 0;
+            
+            projectionMatrix[1][0] = 0;
+            projectionMatrix[1][1] = 2 * nearClippingPlane / (top - bottom);
+            projectionMatrix[1][2] = 0;
+            projectionMatrix[1][3] = 0;
+            
+            projectionMatrix[2][0] = 0;
+            projectionMatrix[2][1] = 0;
+            projectionMatrix[2][2] = -((farClippingPlane + nearClippingPlane) / (farClippingPlane - nearClippingPlane));
+            projectionMatrix[2][3] = -1.f;
+            
+            projectionMatrix[3][0] = 0;
+            projectionMatrix[3][1] = 0;
+            projectionMatrix[3][2] = -((2.f * farClippingPlane * nearClippingPlane) / (farClippingPlane - nearClippingPlane));
+            projectionMatrix[3][3] = 0;
         }
 
         /// @brief Projection to camera space
@@ -51,11 +71,14 @@ class Camera{
             Vec3f pProj;
             projectionMatrix.multVecMatrix(pCamera, pProj);
 
-            printf("p.x=%f, p.y=%f, p.z=%f\n", pProj.x, pProj.y, pProj.z);
+            printf("x=%f,y=%f,z=%f\n",pProj.x,pProj.y,pProj.z);
 
             return pProj;
         }
 
+        /// @brief Projection to raster space
+        /// @param pWorld point in world space
+        /// @return point int raster space
         Vec3f worldToScreen(const Vec3f &pWorld) const
         {
             Vec3f pNDC = worldToNDC(pWorld);
@@ -66,7 +89,8 @@ class Camera{
             pRaster.y = (1 - pNDC.y) / 2 * imageHeight;
             pRaster.z = pNDC.z;
 
-            printf("pR.x=%f, pR.y=%f, pR.z=%f\n", pRaster.x, pRaster.y, pRaster.z);
+            
+            printf("xR=%f,yR=%f,zR=%f\n",pRaster.x,pRaster.y,pRaster.z);
 
             return pRaster;
         }
