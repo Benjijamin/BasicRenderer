@@ -23,9 +23,7 @@ int main()
     printf("\n");
     int imageWidth = 512, imageHeight = 512;
 
-    //create camera
-    Camera cam;
-    cam.rescaleAspectRatio();
+    Camera cam(imageWidth, imageHeight);
 
     Vec3i *imageBuffer = new Vec3i[imageWidth * imageHeight];
     float *depthBuffer = new float[imageWidth * imageHeight];
@@ -40,8 +38,7 @@ int main()
 
     Tri tris[1] = 
     {
-        //Tri(Vec3f(-3,-0.5,10), Vec3f(-1,-1,10), Vec3f(-1.5,-2,10)),
-        Tri(Vec3f(0, 0, -5), Vec3f(1, 0, -5), Vec3f(0, 1, -5))
+        Tri(Vec3f(0, 0, -0.11), Vec3f(0.1, 0, -0.11), Vec3f(0.5, 1, -2))
     };
 
 
@@ -49,6 +46,7 @@ int main()
     {
         Vec2f bbmin = INFINITY, bbmax = -INFINITY;
         Vec3f vProj[3];
+        int oobV = 0;
         Vec3f vAttr[3] = 
         {
             {1,0,0},
@@ -72,15 +70,6 @@ int main()
             if(vProj[i].x > bbmax.x) { bbmax.x = vProj[i].x; }
             if(vProj[i].y > bbmax.y) { bbmax.y = vProj[i].y; }
 
-            // Dark Ritual B
-            vAttr[i].x = vAttr[i].x / vProj[i].z;
-            vAttr[i].y = vAttr[i].y / vProj[i].z;
-            vAttr[i].z = vAttr[i].z / vProj[i].z;
-
-            texCoord[i].x = texCoord[i].x / vProj[i].z;
-            texCoord[i].y = texCoord[i].y / vProj[i].z;
-
-            //Instant
             vProj[i].z = 1 / vProj[i].z;
         }
 
@@ -97,7 +86,6 @@ int main()
                 {
                     Vec3f w = barycentricPoint(Vec2f(i,j), vProj[0].xy(), vProj[1].xy(), vProj[2].xy());
 
-                    //Add BBB to your mana pool
                     float z = 1 / (w.x * vProj[0].z + w.y * vProj[1].z + w.z * vProj[2].z);
 
                     if(z < depthBuffer[j * imageWidth + i])
@@ -105,20 +93,7 @@ int main()
                         depthBuffer[j * imageWidth + i] = z;
                     }
 
-                    //imageBuffer[j * imageWidth + i] = Vec3i(depthBuffer[j * imageWidth + i] * 10);
-
-                    
-                    float u = w.x * texCoord[0].x + w.y * texCoord[1].x + w.z * texCoord[2].x;
-                    float v = w.x * texCoord[0].y + w.y * texCoord[1].y + w.z * texCoord[2].y;
-                    
-                    u *= z;
-                    v *= z;
-
-                    Vec3f v0cam, v1cam, v2cam;
-
-                    float texture = (fmod(u * 10, 1) > 0.5) ^ (fmod(v * 10, 1) < 0.5);
-
-                    imageBuffer[j * imageWidth + i] = Vec3i(texture * 255);
+                    imageBuffer[j * imageWidth + i] = Vec3i(z * 255);
                 }
             }
         }

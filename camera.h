@@ -3,47 +3,32 @@
 
 class Camera{
     public:
-        Camera(){}
+        Camera(int w, int h): imageWidth(w), imageHeight(h)
+        {
+            setProjectionMatrix();
+        }
 
-        float inchToMm = 25.4;
-
-        float focalLength = 35;
-        float filmApertureWidth = 0.98;
-        float filmApertureHeight = 0.735;
         float nearClippingPlane = 0.1;
-        float farClippingPlane = 1000;
-
-        //screen
-        float top = ((filmApertureHeight * inchToMm / 2) / focalLength) * nearClippingPlane;
-        float bottom = -top;
-        float filmAspectRatio = filmApertureWidth / filmApertureHeight;
-        float right = top * filmAspectRatio;
-        float left = -right;
+        float farClippingPlane = 100;
+        float fov = 90;
 
         //resolution
         int imageWidth = 512, imageHeight = 512;
         float deviceAspectRatio = imageWidth / imageHeight;
 
         Matrix4f worldToCameraM;
+        Matrix4f projectionMatrix;
 
-        void rescaleAspectRatio()
+        void setProjectionMatrix()
         {
-            float xS = 1;
-            float yS = 1;
-
-            if(filmAspectRatio > deviceAspectRatio)
-            {
-                xS = deviceAspectRatio / filmAspectRatio;
-            } 
-            else 
-            {
-                yS = filmAspectRatio / deviceAspectRatio;
-            }
-
-            right *= xS;
-            left = -right;
-            top *= yS;
-            bottom = -top;
+            //Rescaling x and y coordinates according to fieldOfView, and rescaling z to [0(near),1(far)]
+            float fovScale = 1 / tan(fov * 0.5 * M_PI / 180);
+            float zRemapZ = -farClippingPlane / (farClippingPlane - nearClippingPlane);
+            float zRemapW = -farClippingPlane * nearClippingPlane / (farClippingPlane - nearClippingPlane);
+            projectionMatrix = Matrix4f( fovScale , 0, 0, 0,
+                                         0, fovScale, 0, 0,
+                                         0, 0, zRemapZ, -1,
+                                         0, 0, zRemapW, 0);
         }
 
         /// @brief Projection to camera space
@@ -56,35 +41,33 @@ class Camera{
             return pCamera;
         }
 
-        /// @brief Projection to screen space
+        /// @brief Projection to NDC via projection matrix
         /// @param pWorld point in world space
-        /// @return point in screen space
-        Vec3f worldToScreen(const Vec3f &pWorld) const
+        /// @return NDC point
+        Vec3f worldToNDC(const Vec3f &pWorld) const
         {
             //worldspace to cameraSpace
             Vec3f pCamera = worldToCamera(pWorld);
+            Vec3f pProj;
+            projectionMatrix.multVecMatrix(pCamera, pProj);
 
-            //projection
-            Vec3f pScreen;
-            pScreen.x = nearClippingPlane * pCamera.x / -pCamera.z;
-            pScreen.y = nearClippingPlane * pCamera.y / -pCamera.z;
+            printf("p.x=%f, p.y=%f, p.z=%f\n", pProj.x, pProj.y, pProj.z);
 
-            //[-1,1]
-            Vec3f pNDC;
-            pNDC.x = 2 * pScreen.x / (right - left) - (right + left) / (right - left);
-            pNDC.y = 2 * pScreen.y / (top - bottom) - (top + bottom) / (top - bottom);
+            return pProj;
+        }
+
+        Vec3f worldToScreen(const Vec3f &pWorld) const
+        {
+            Vec3f pNDC = worldToNDC(pWorld);
 
             Vec3f pRaster;
             pRaster.x = (pNDC.x + 1) / 2 * imageWidth;
             //flip from screen space(origin bottom left) to raster space(origin top left)
             pRaster.y = (1 - pNDC.y) / 2 * imageHeight;
-            pRaster.z = -pCamera.z;
+            pRaster.z = pNDC.z;
+
+            printf("pR.x=%f, pR.y=%f, pR.z=%f\n", pRaster.x, pRaster.y, pRaster.z);
 
             return pRaster;
-        }
-
-        bool isInView( const Vec2i pScreen ) const
-        {
-            return (pScreen.x >= left && pScreen.x <= right && pScreen.y >= bottom && pScreen.y <= top);
         }
 };
