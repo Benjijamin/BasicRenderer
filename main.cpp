@@ -36,9 +36,10 @@ int main()
         }
     }
 
-    Tri tris[1] = 
+    Tri tris[2] = 
     {
-        Tri(Vec3f(0, 0, -0.21), Vec3f(1, 0, -3), Vec3f(1, 1, -5))
+        Tri(Vec3f(0, 0, -0.33), Vec3f(1, 0, -3.3), Vec3f(1, 1, -5)),
+        Tri(Vec3f(0.8, 1.2, -7), Vec3f(0.01, 0, -0.3), Vec3f(1, 0.1, -3))
     };
 
 
@@ -91,9 +92,8 @@ int main()
                     if(z < depthBuffer[j * imageWidth + i])
                     {
                         depthBuffer[j * imageWidth + i] = z;
+                        imageBuffer[j * imageWidth + i] = Vec3i(w.x * 255, w.y * 255, w.z * 255);
                     }
-
-                    imageBuffer[j * imageWidth + i] = Vec3i(z * 255);
                 }
             }
         }
