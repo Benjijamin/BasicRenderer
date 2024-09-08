@@ -15,4 +15,6 @@ class PpmWriter
         void print(const Vec3i *imageBuffer) const;
 };
 
+void readImage(const char *fileName, Vec3i *imageBuffer);
+
 #endif

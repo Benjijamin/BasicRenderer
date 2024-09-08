@@ -1,5 +1,7 @@
 #include <vec2.h>
 #include <vec3.h>
+#include <stdio.h>
+#include <matrix.h>
 
 class Camera{
     public:
