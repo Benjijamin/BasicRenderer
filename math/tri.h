@@ -1,8 +1,8 @@
 #ifndef TRI_H
 #define TRI_H
 
-#include "vec2.h"
-#include "vec3.h"
+#include <vec2.h>
+#include <vec3.h>
 
 class Tri
 {

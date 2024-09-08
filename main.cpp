@@ -3,13 +3,14 @@
 #include <chrono>
 #include <ctime>
 #include <cmath>
-#include "date.h"
-#include "ppm.h"
-#include "vec2.h"
-#include "vec3.h"
-#include "matrix.h"
-#include "tri.h"
-#include "camera.h"
+#include <date.h>
+#include <ppm.h>
+#include <vec2.h>
+#include <vec3.h>
+#include <matrix.h>
+#include <tri.h>
+#include <camera.h>
+#include <glfw3.h>
 
 int main()
 {
@@ -103,6 +104,20 @@ int main()
     PpmWriter printer = PpmWriter(imageWidth, imageHeight);
     printer.print(imageBuffer);
     printf("image printed to output.ppm\n");
+
+    glfwInit();
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "Test window", nullptr, nullptr);
+
+    while(!glfwWindowShouldClose(window))
+    {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+
+    glfwTerminate();
 
     return 0;
 }

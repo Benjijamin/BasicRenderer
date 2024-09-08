@@ -1,4 +1,4 @@
-#include "tri.h"
+#include <tri.h>
 
 Tri::Tri() {}
 Tri::Tri(Vec3f p1, Vec3f p2, Vec3f p3)

@@ -1,15 +1,6 @@
-#include <iostream>
-#include <fstream>
-#include <vector>
-#include "vec3.h" 
+#include <ppm.h>
 
-class PpmWriter
-{
-    public:
-        PpmWriter(int width, int height) : w(width), h(height){}
-        int w,h;
-
-        void print(const Vec3i *imageBuffer) const
+void PpmWriter::print(const Vec3i *imageBuffer) const
         {
             std::ofstream file;
             file.open("output.ppm");
@@ -28,4 +19,3 @@ class PpmWriter
 
             file.close();
         }
-};

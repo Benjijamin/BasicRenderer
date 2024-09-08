@@ -3,7 +3,10 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/GLFW/include",
+                "${workspaceFolder}/math",
+                "${workspaceFolder}/utils",
+                "${workspaceFolder}/*"
             ],
             "defines": [
                 "_DEBUG",

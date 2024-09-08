@@ -1,6 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
-#include "vec2.h"
+
+#include <vec2.h>
 
 template<typename T>
 class Vec3
