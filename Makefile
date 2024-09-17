@@ -1,8 +1,8 @@
-VULKANSDK=C:/VulkanSDK/1.3.290.0/Include/vulkan
+VULKANSDK=C:/VulkanSDK/1.3.290.0
 WORKDIR=F:/Cpp/BasicRenderer
 
-VULKANHEADERS=$(VULKANSDK)/Include/vulkan
-INCLUDES=-I$(WORKDIR)/ -I$(WORKDIR)/math -I$(WORKDIR)/utils -I$(WORKDIR)/GLFW/include -I$(VULKANSDK)
+VULKANHEADERS=$(VULKANSDK)/Include
+INCLUDES=-I$(WORKDIR)/ -I$(WORKDIR)/math -I$(WORKDIR)/utils -I$(WORKDIR)/GLFW/include -I$(VULKANHEADERS) 
 
 VULKANLIB=$(VULKANSDK)/Lib
 GLFWLIB := $(WORKDIR)/GLFW/lib
@@ -20,4 +20,4 @@ export INCLUDES
 main.exe: main.cpp
 	make -C math
 	make -C	utils
-	g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -o build/main.exe
+	g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -lvulkan-1 -o build/main.exe

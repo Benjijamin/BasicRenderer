@@ -73,8 +73,6 @@ class Camera{
             Vec3f pProj;
             projectionMatrix.multVecMatrix(pCamera, pProj);
 
-            printf("x=%f,y=%f,z=%f\n",pProj.x,pProj.y,pProj.z);
-
             return pProj;
         }
 
@@ -90,9 +88,6 @@ class Camera{
             //flip from screen space(origin bottom left) to raster space(origin top left)
             pRaster.y = (1 - pNDC.y) / 2 * imageHeight;
             pRaster.z = pNDC.z;
-
-            
-            printf("xR=%f,yR=%f,zR=%f\n",pRaster.x,pRaster.y,pRaster.z);
 
             return pRaster;
         }
