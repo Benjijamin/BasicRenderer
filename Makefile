@@ -19,6 +19,7 @@ UTILS_OBJECTS := $(UTILS:.cpp=.o)
 OBJECTS := $(MATH_OBJECTS) $(UTILS_OBJECTS)
 
 export INCLUDES
+export VULKANSDK
 
 main.exe: main.cpp
 	make -C math
