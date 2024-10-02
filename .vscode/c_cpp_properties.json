@@ -8,6 +8,7 @@
                 "${workspaceFolder}/GLFW/include",
                 "${workspaceFolder}/math",
                 "${workspaceFolder}/utils",
+                "${workspaceFolder}/vulkan",
                 "${workspaceFolder}/*"
             ],
             "defines": [

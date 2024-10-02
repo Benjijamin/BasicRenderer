@@ -64,6 +64,10 @@
         "thread": "cpp",
         "cinttypes": "cpp",
         "typeindex": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "format": "cpp",
+        "charconv": "cpp",
+        "text_encoding": "cpp",
+        "variant": "cpp"
     }
 }
