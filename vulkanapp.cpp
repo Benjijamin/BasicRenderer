@@ -12,35 +12,7 @@
 #include <algorithm>
 #include <utils.h>
 #include <vkstructs.h>
-
-VkResult CreateDebugUtilsMessengerEXT( 
-    VkInstance instance, 
-    const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo,
-    const VkAllocationCallbacks* pAllocator, 
-    VkDebugUtilsMessengerEXT* pDebugMessenger)
-{
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    if(func != nullptr) 
-    { 
-        return func(instance, pCreateInfo, pAllocator, pDebugMessenger); 
-    }
-    else
-    { 
-        return VK_ERROR_EXTENSION_NOT_PRESENT; 
-    }
-}
-
-void DestroyDebugUtilsMessengerEXT( 
-    VkInstance instance, 
-    VkDebugUtilsMessengerEXT debugMessenger, 
-    const VkAllocationCallbacks* pAllocator)
-{
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
-    if(func != nullptr)
-    { 
-        func(instance, debugMessenger, pAllocator); 
-    }
-}
+#include <vkdebug.h>
 
 struct QueueFamilyIndices
 {
@@ -108,51 +80,7 @@ class VulkanApp
         {
             VK_KHR_SWAPCHAIN_EXTENSION_NAME
         };
-
-        //------------------------$Validation----------------------//
-        //--------------------------------------------------------//
-        //--------------------------------------------------------//
-
-        bool checkValidationLayerSupport()
-        {
-            uint32_t layerCount;
-            vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
-
-            std::vector<VkLayerProperties> availableLayers(layerCount);
-            vkEnumerateInstanceLayerProperties(&layerCount, availableLayers.data());
-
-            for(const char* layerName : validationLayers) 
-            {
-                bool layerFound = false;
-
-                for(const auto& layerProperties : availableLayers)
-                {
-                    if(strcmp(layerName, layerProperties.layerName) == 0)
-                    {
-                        layerFound = true;
-                        break;
-                    }
-                }
-
-                if(!layerFound)
-                { return false; }
-            }
-
-            return true;
-        }
         
-        void setupDebugMessenger()
-        {
-            if(!enableValidationLayers) return;
-
-            VkDebugUtilsMessengerCreateInfoEXT createInfo;
-            populateDebugMessengerCreateInfo(createInfo);
-
-            std::cout << "Creating debug utils..." << std::endl;
-            if(CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS)
-            { throw std::runtime_error("failed to set up debug messenger"); }
-        }
-
         std::vector<const char*> getRequiredExtensions()
         {
             uint32_t glfwExtensionCount = 0;
@@ -173,7 +101,7 @@ class VulkanApp
         
         void createInstance()
         {
-            if(enableValidationLayers && !checkValidationLayerSupport())
+            if(enableValidationLayers && !checkValidationLayerSupport(validationLayers))
             { throw std::runtime_error("validation layers not available"); }
 
             VkApplicationInfo appInfo{};
@@ -673,14 +601,6 @@ class VulkanApp
             { throw std::runtime_error("error creating semaphores"); }
         }
 
-        void createSurface()
-        {
-            if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
-            {
-                throw std::runtime_error("failed to create surface");
-            }
-        }
-
         void drawFrame()
         {
             vkWaitForFences(device, 1, &inFlightFence, VK_TRUE, UINT64_MAX);
@@ -723,11 +643,20 @@ class VulkanApp
 
             vkQueuePresentKHR(presentQueue, &presentInfo);
         }
+
+        void createSurface()
+        {
+            if(glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to create surface");
+            }
+        }
         
         void initVulkan()
         {
             createInstance();
-            setupDebugMessenger();
+            if(enableValidationLayers)
+            { setupDebugMessenger(instance, debugMessenger); }
             createSurface();
             pickPhysicalDevice();
             createLogicalDevice();
