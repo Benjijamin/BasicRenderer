@@ -2,6 +2,7 @@
 #include <vkstructs.h>
 #include <limits>
 #include <algorithm>
+#include <array>
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
             VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -268,14 +269,16 @@ void populatePipelineDynamicStateCreateInfo(VkPipelineDynamicStateCreateInfo &dy
     dynamicState.pDynamicStates = dynamicStates.data();
 }
 
-void populatePipelineVertexInputStateCreateInfo(VkPipelineVertexInputStateCreateInfo &vertexInputInfo)
+void populatePipelineVertexInputStateCreateInfo(VkPipelineVertexInputStateCreateInfo &vertexInputInfo,
+    VkVertexInputBindingDescription &vertexBindingDescription, 
+    std::array<VkVertexInputAttributeDescription, 2> &vertexAttributeDescriptions)
 {
     vertexInputInfo = {};
     vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertexInputInfo.vertexBindingDescriptionCount = 0;
-    vertexInputInfo.pVertexBindingDescriptions = nullptr;
-    vertexInputInfo.vertexAttributeDescriptionCount = 0;
-    vertexInputInfo.pVertexAttributeDescriptions = nullptr;
+    vertexInputInfo.vertexBindingDescriptionCount = 1;
+    vertexInputInfo.pVertexBindingDescriptions = &vertexBindingDescription;
+    vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(vertexAttributeDescriptions.size());
+    vertexInputInfo.pVertexAttributeDescriptions = vertexAttributeDescriptions.data();
 }
 
 void populatePipelineInputAssemblyStateCreateInfo(VkPipelineInputAssemblyStateCreateInfo &inputAssembly)
@@ -324,7 +327,7 @@ void populatePipelineRasterizationStateCreateInfo(VkPipelineRasterizationStateCr
     rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizer.lineWidth = 1.0f;
     rasterizer.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizer.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizer.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizer.depthBiasEnable = VK_FALSE;
     rasterizer.depthBiasConstantFactor = 0.0f;
     rasterizer.depthBiasClamp = 0.0f;
@@ -373,12 +376,67 @@ void populatePipelineColorBlendStateCreateInfo(VkPipelineColorBlendStateCreateIn
     colorBlending.blendConstants[3] = 0.0f;
 }
 
-void populatePipelineLayoutCreateInfo(VkPipelineLayoutCreateInfo &pipelineLayoutInfo)
+void populatePipelineLayoutCreateInfo(VkPipelineLayoutCreateInfo &pipelineLayoutInfo,
+    VkDescriptorSetLayout &descriptorSetLayout)
 {
     pipelineLayoutInfo = {};
     pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount = 0;
-    pipelineLayoutInfo.pSetLayouts = nullptr;
+    pipelineLayoutInfo.setLayoutCount = 1;
+    pipelineLayoutInfo.pSetLayouts = &descriptorSetLayout;
     pipelineLayoutInfo.pushConstantRangeCount = 0;
     pipelineLayoutInfo.pPushConstantRanges = nullptr;
+}
+
+void populateVertexBufferCreateInfo(VkBufferCreateInfo &bufferInfo,
+    const std::vector<Vertex> &vertices)
+{
+    bufferInfo = {};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = sizeof(vertices[0]) * vertices.size();
+    bufferInfo.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+}
+
+void populateBufferCreateInfo(VkBufferCreateInfo &bufferInfo, VkDeviceSize &size,
+    VkBufferUsageFlags &usage)
+{
+    bufferInfo = {};
+    bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    bufferInfo.size = size;
+    bufferInfo.usage = usage;
+    bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+}
+
+void populateUniformBufferObjectLayoutBinding(VkDescriptorSetLayoutBinding &uboLayoutBinding)
+{
+    uboLayoutBinding = {};
+    uboLayoutBinding.binding = 0;
+    uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    uboLayoutBinding.descriptorCount = 1;
+    uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    uboLayoutBinding.pImmutableSamplers = nullptr;
+}
+
+void populateDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo &layoutInfo,
+    VkDescriptorSetLayoutBinding &layoutBinding)
+{
+    layoutInfo = {};
+    layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    layoutInfo.bindingCount = 1;
+    layoutInfo.pBindings = &layoutBinding;
+}
+
+void populateWriteDescriptorSet(VkWriteDescriptorSet &descriptorWrite, 
+    VkDescriptorSet &descriptorSet, VkDescriptorBufferInfo &bufferInfo)
+{
+    descriptorWrite = {};
+    descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+    descriptorWrite.dstSet = descriptorSet;
+    descriptorWrite.dstBinding = 0;
+    descriptorWrite.dstArrayElement = 0;
+    descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    descriptorWrite.descriptorCount = 1;
+    descriptorWrite.pBufferInfo = &bufferInfo;
+    descriptorWrite.pImageInfo = nullptr;
+    descriptorWrite.pTexelBufferView = nullptr;
 }

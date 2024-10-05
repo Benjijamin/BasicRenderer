@@ -3,10 +3,11 @@ WORKDIR=$(CURDIR)
 
 VULKANHEADERS=$(VULKANSDK)/Include
 GLFWINCLUDE=$(WORKDIR)/GLFW/include
+GLMINCLUDE=$(WORKDIR)/glm
 MATHINCLUDE=$(WORKDIR)/math
 UTILSINCLUDE=$(WORKDIR)/utils
 VKINCLUDE=$(WORKDIR)/vulkan
-INCLUDES=-I$(WORKDIR)/ -I$(MATHINCLUDE) -I$(UTILSINCLUDE) -I$(VKINCLUDE) -I$(GLFWINCLUDE) -I$(VULKANHEADERS) 
+INCLUDES=-I$(WORKDIR)/ -I$(MATHINCLUDE) -I$(UTILSINCLUDE) -I$(VKINCLUDE) -I$(GLFWINCLUDE) -I$(GLMINCLUDE) -I$(VULKANHEADERS) 
 
 VULKANLIB=$(VULKANSDK)/Lib
 GLFWLIB=$(WORKDIR)/GLFW/lib
@@ -25,10 +26,14 @@ export INCLUDES
 export VULKANSDK
 
 main.exe: main.cpp
-	make -C math
-	make -C	utils
-	make -C shaders
-	make -C vulkan
-	$(info making exe)
-	g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -lvulkan-1 -o $(WORKDIR)/build/main.exe
+	@echo making math
+	@make -C math
+	@echo making utils
+	@make -C utils
+	@echo making shaders
+	@make -C shaders
+	@echo making vulkan
+	@make -C vulkan
+	@echo making exe
+	@g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -lvulkan-1 -o $(WORKDIR)/build/main.exe
 	@echo build finished

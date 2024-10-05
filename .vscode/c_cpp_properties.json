@@ -6,6 +6,7 @@
                 "C:/VulkanSDK/1.3.290.0/Include/**",
                 "C:/VulkanSDK/1.3.290.0/Include/vk_video",
                 "${workspaceFolder}/GLFW/include",
+                "${workspaceFolder}/glm",
                 "${workspaceFolder}/math",
                 "${workspaceFolder}/utils",
                 "${workspaceFolder}/vulkan",
