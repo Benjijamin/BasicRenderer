@@ -30,5 +30,5 @@ main.exe: main.cpp
 	@echo making vulkan
 	@make -C vulkan
 	@echo making exe
-	@g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -lvulkan-1 -o $(WORKDIR)/build/main.exe
+	@g++ -g $(INCLUDES) $(LINKS) $(OBJECTS) main.cpp -lglfw3 -lgdi32 -lvulkan-1 -O3 -o $(WORKDIR)/build/main.exe
 	@echo build finished

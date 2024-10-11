@@ -5,6 +5,7 @@
 #define GLFW_INCLUDE_VULKAN
 #include <vector>
 #include <vkvertex.h>
+#include <array>
 
 void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT &createInfo);
 
@@ -29,18 +30,19 @@ void populateSwapchainCreateInfo(VkSwapchainCreateInfoKHR &createInfo,
     VkFormat &outFormat, VkExtent2D &outExtent);
 
 void populateImageViewCreateInfo(VkImageViewCreateInfo &createInfo,
-    VkImage &image, VkFormat &imageFormat);
+    VkImage &image, VkFormat &imageFormat, VkImageAspectFlags &aspectFlags);
 
 void populateColorAttachment(VkAttachmentDescription &attachment, VkFormat &imageFormat);
 
 void populateColorAttachmentRef(VkAttachmentReference &colorAttachmentRef);
 
-void populateSubpass(VkSubpassDescription &subpass, VkAttachmentReference &colorAttachmentRef);
+void populateSubpass(VkSubpassDescription &subpass, 
+    VkAttachmentReference &colorAttachmentRef, VkAttachmentReference &depthAttachmentRef);
 
 void populateSubpassDependency(VkSubpassDependency &dependency);
 
 void populateRenderPassCreateInfo(VkRenderPassCreateInfo &createInfo,
-    VkAttachmentDescription &colorAttachment, VkSubpassDescription &subpass,
+    std::array<VkAttachmentDescription, 2> &attachments, VkSubpassDescription &subpass,
     VkSubpassDependency &dependency);
 
 void populateVertShaderStageCreateInfo(VkPipelineShaderStageCreateInfo &vertShaderStageInfo,
@@ -54,7 +56,7 @@ void populatePipelineDynamicStateCreateInfo(VkPipelineDynamicStateCreateInfo &dy
 
 void populatePipelineVertexInputStateCreateInfo(VkPipelineVertexInputStateCreateInfo &vertexInputInfo,
     VkVertexInputBindingDescription &vertexBindingDescription, 
-    std::array<VkVertexInputAttributeDescription, 2> &vertexAttributeDescriptions);
+    std::array<VkVertexInputAttributeDescription, 3> &vertexAttributeDescriptions);
 
 void populatePipelineInputAssemblyStateCreateInfo(VkPipelineInputAssemblyStateCreateInfo &inputAssembly);
 
@@ -86,9 +88,23 @@ void populateBufferCreateInfo(VkBufferCreateInfo &bufferInfo, VkDeviceSize &size
 void populateUniformBufferObjectLayoutBinding(VkDescriptorSetLayoutBinding &uboLayoutBinding);
 
 void populateDescriptorSetLayoutCreateInfo(VkDescriptorSetLayoutCreateInfo &layoutInfo,
-    VkDescriptorSetLayoutBinding &layoutBinding);
+    std::array<VkDescriptorSetLayoutBinding, 2> &layoutBindings);
 
-void populateWriteDescriptorSet(VkWriteDescriptorSet &descriptorWrite, 
-    VkDescriptorSet &descriptorSet, VkDescriptorBufferInfo &bufferInfo);
+void populateWriteDescriptorSet(std::array<VkWriteDescriptorSet, 2> &descriptorWrites, 
+    VkDescriptorSet &descriptorSet, VkDescriptorBufferInfo &bufferInfo, VkDescriptorImageInfo &imageInfo);
+
+void populateImageCreateInfo(VkImageCreateInfo &imageInfo, uint32_t width, uint32_t height,
+    VkFormat &format, VkImageTiling &tiling, VkImageUsageFlags &usage);
+
+void populateImageMemoryBarrier(VkImageMemoryBarrier &barrier,
+    VkImageLayout &oldLayout, VkImageLayout &newLayout, VkImage &image);
+
+void populateSamplerCreateInfo(VkSamplerCreateInfo &samplerInfo, float maxAnisotropy);
+
+void populateDepthAttachment(VkAttachmentDescription &depthAttachment, VkFormat format);
+
+void populateDepthAttachmentRef(VkAttachmentReference &depthAttachmentRef);
+
+void populatePipelineDepthStencilStateCreateInfo(VkPipelineDepthStencilStateCreateInfo &depthStencil);
 
 #endif
